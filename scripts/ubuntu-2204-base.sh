@@ -3,7 +3,7 @@
 # ~~# RESUMEN: paquetes de terminal y gráficos para el usuario ~~
 
 # # Ejecutar en Ubuntu Desktop 22.04 LTS como usuario (no root):
-# bash <(curl -fsSL https://github.com/pabloqpacin/lab_asterisk/raw/main/scripts/Ubuntu_2404-base.sh)
+# bash -c "$(wget -qLO - https://github.com/pabloqpacin/lab-cybersecurity/raw/main/scripts/ubuntu-2204-base.sh)"
 
 
 set_variables() {
@@ -12,6 +12,7 @@ set_variables() {
         'N'|'n') sa_install="sudo apt-get install"      ;;
         *)       sa_install="sudo apt-get install -y"   ;;
     esac
+    unset opt
     sa_update="sudo apt-get update"
 }
 
@@ -253,21 +254,19 @@ if true; then
             setup_nvim
         ;;
         *)
-            opt_zsh=''
-            while [[ $opt_zsh != 'y' && $opt_zsh != 'n' ]]; do
-                read -p "Establecer zsh [y/n]? " opt_zsh
+            opt=''
+            while [[ $opt != 'y' && $opt != 'n' ]]; do
+                read -p "Establecer zsh [y/n]? " opt
             done
-            if [[ $opt_zsh == 'y' ]]; then
-                setup_zsh
-            fi
+            case $opt in 'y') setup_zsh ;; esac
+            unset opt
 
-            opt_nvim=''
-            while [[ $opt_nvim != 'y' && $opt_nvim != 'n' ]]; do
-                read -p "Instalar y configurar Neovim [y/n]? " opt_nvim
+            opt=''
+            while [[ $opt != 'y' && $opt != 'n' ]]; do
+                read -p "Instalar y configurar Neovim [y/n]? " opt
             done
-            if [[ $opt_nvim == 'y' ]]; then
-                setup_nvim
-            fi
+            case $opt in 'y') setup_nvim ;; esac
+            unset opt
         ;;
     esac
 
