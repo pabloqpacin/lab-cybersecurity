@@ -230,6 +230,13 @@ install_desktop_pkgs(){
         ln -s ~/dotfiles/.config/code/User/settings.json ~/.config/VSCodium/User/settings.json
     fi
 
+    if ! command -v wireshark &>/dev/null; then
+        read -p "Responde 'Yes' a 'Should non-superusers be able to capture packets' " null
+        $sa_install wireshark
+        sudo usermod -aG wireshark "$USER"
+        # newgrp wireshark || reboot
+    fi
+
 }
 
 # info_vbox_additions(){
@@ -237,6 +244,19 @@ install_desktop_pkgs(){
 #     echo "- VirtualBox: Devices > Insert Guest Additions CD image..."
 #     read -p "- Ubuntu: /media/setesur/VBox_GAs_6.1.50 > Click derecho en 'autorun.sh' > Ejecutar " null
 # }
+
+set_hostname() {
+    opt=''
+    echo -e "\nHostname actual: $(hostname)"
+    read -p "Establecer nuevo hostname [y/N]? " opt
+    case $opt in 'y')
+        read -p "Introduce el nuevo hostname: " hostname_new
+        sudo hostnamectl set-hostname "$hostname_new"
+        echo "Hostname actual: $(hostname)"
+        ;;
+    esac
+    unset opt
+}
 
 
 # ---
@@ -274,6 +294,8 @@ if true; then
     install_nerdfonts
     install_desktop_pkgs
     # info_vbox_additions
+
+    set_hostname
 fi
 
 echo "" && neofetch && sudo grc docker ps -a && echo -e "\n" && df -h | grep -e '/$' -e 'Mo'
@@ -306,7 +328,7 @@ echo "" && neofetch && sudo grc docker ps -a && echo -e "\n" && df -h | grep -e 
     # fi
 
     # if ! command -v nmapsi4 &>/dev/null; then
-    #     $sa_install nmapsi4
+    #     $sa_install nmapsi4 || $sa_install zenmap
     # fi
 
     # if ! command -v wireshark &>/dev/null; then
