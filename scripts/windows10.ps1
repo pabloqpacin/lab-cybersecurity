@@ -17,7 +17,7 @@ function winget_update_install {
 
     function admin_users {
         winget install `
-            microsoft.windowsterminal microsoft.powershell devcom.jetbrainsmononerdfont
+            microsoft.windowsterminal microsoft.powershell devcom.jetbrainsmononerdfont     # jandedobbeleer.ohmyposh
         
         winget install `
             sharkdp.bat eza-community.eza junegunn.fzf git.git gerardog.gsudo `

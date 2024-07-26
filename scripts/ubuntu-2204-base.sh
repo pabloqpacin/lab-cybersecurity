@@ -117,7 +117,7 @@ clone_symlink_dotfiles() {
 }
 
 setup_zsh(){
-    $sa_update && $sa_install zsh
+    $sa_install zsh
 
     if [ ! -d ~/.oh-my-zsh ]; then
         yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -206,7 +206,7 @@ install_desktop_pkgs(){
 
     if ! command -v alacritty &>/dev/null; then
         sudo add-apt-repository ppa:aslatter/ppa -y
-        $sa_update && $sa_install alacritty
+        $sa_install alacritty
     fi
 
     if ! command -v brave-browser &>/dev/null; then
@@ -215,7 +215,7 @@ install_desktop_pkgs(){
         echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] \
             https://brave-browser-apt-release.s3.brave.com/ stable main" \
             | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-        $sa_update && $sa_install brave-browser
+        $sa_install brave-browser
     fi
 
     if ! command -v codium &>/dev/null; then
@@ -224,7 +224,7 @@ install_desktop_pkgs(){
             | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
         echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
             | sudo tee /etc/apt/sources.list.d/vscodium.list
-        $sa_update && $sa_install codium
+        $sa_install codium
 
         bash $HOME/dotfiles/scripts/setup/codium-extensions.sh
         ln -s ~/dotfiles/.config/code/User/settings.json ~/.config/VSCodium/User/settings.json
@@ -232,9 +232,17 @@ install_desktop_pkgs(){
 
     if ! command -v wireshark &>/dev/null; then
         read -p "Responde 'Yes' a 'Should non-superusers be able to capture packets' " null
-        $sa_install wireshark
+        $sa_install tshark wireshark
         sudo usermod -aG wireshark "$USER"
         # newgrp wireshark || reboot
+    fi
+
+    # Ojo con Wayland VS x11
+    if ! command -v anydesk &>/dev/null && ! flatpak list 2>/dev/null | grep -q 'anydesk'; then
+        wget -qO - https://keys.anydesk.com/repos/DEB-GPG-KEY | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/anydesk-archive-keyring.gpg
+        echo "deb http://deb.anydesk.com/ all main" | sudo tee /etc/apt/sources.list.d/anydesk-stable.list
+        $sa_install anydesk
+        sudo systemctl disable anydesk
     fi
 
 }
@@ -319,22 +327,8 @@ echo "" && neofetch && sudo grc docker ps -a && echo -e "\n" && df -h | grep -e 
     # $sa_install --no-install-recommends python3-pip python3-venv oneko
     # $snap_install cheat
 
-
-    # if ! command -v anydesk &>/dev/null && ! flatpak list 2>/dev/null | grep -q 'anydesk'; then
-    #     wget -qO - https://keys.anydesk.com/repos/DEB-GPG-KEY | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/anydesk-archive-keyring.gpg
-    #     echo "deb http://deb.anydesk.com/ all main" | sudo tee /etc/apt/sources.list.d/anydesk-stable.list
-    #     $sa_update && $sa_install anydesk
-    #     sudo systemctl disable anydesk
-    # fi
-
     # if ! command -v nmapsi4 &>/dev/null; then
-    #     $sa_install nmapsi4 || $sa_install zenmap
-    # fi
-
-    # if ! command -v wireshark &>/dev/null; then
-    #     read -p "En el menú que aparecerá, selecciona Yes " null  
-    #     $sa_update && $sa_install wireshark tshark
-    #     sudo usermod -aG wireshark $USER
+    #     $sa_install nmapsi4 || $sa_install zenmap alien
     # fi
 
     # if ! command -v keepassxc &>/dev/null; then
